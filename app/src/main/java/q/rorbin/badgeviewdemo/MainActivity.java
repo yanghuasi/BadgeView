@@ -45,27 +45,39 @@ public class MainActivity extends AppCompatActivity {
     EditText et_badgenumber, et_badgetext;
     ImageView imageview, iv_badgecolor, iv_numbercolor;
     Button button, btn_animation;
+    //可选中的点
     List<RadioButton> radioButtons = new ArrayList<>();
+    //已选中的点
     CompoundButton lastRadioButton;
+    //进度条
     SeekBar seekBar_offsetx, seekBar_padding, seekBar_offsety, seekBar_numbersize;
+    //开关
     Switch swicth_exact, swicth_draggable, swicth_shadow;
-
+    //小红点
     List<Badge> badges;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //初始化界面
         initView();
+        //初始化监听
         initListener();
+        //初始化小红点
         initBadge();
+        //开关设置未开启
         swicth_draggable.setChecked(true);
     }
 
     private void initBadge() {
         badges = new ArrayList<>();
+        //设置BadgeView里显示的数字
         badges.add(new QBadgeView(this).bindTarget(textview).setBadgeNumber(5));
+        //设置BadgeView里显示的文字、颜色
         badges.add(new QBadgeView(this).bindTarget(imageview).setBadgeText("PNG").setBadgeTextColor(0x00000000)
+                //设置BadgeView显示的位置、背景色
                 .setBadgeGravity(Gravity.BOTTOM | Gravity.END).setBadgeBackgroundColor(0xff03a9f4)
+                //设置BadgeView里显示的样式
                 .setBadgeBackground(getResources().getDrawable(R.drawable.shape_round_rect)));
         badges.add(new QBadgeView(this).bindTarget(button).setBadgeText("新").setBadgeTextSize(13, true)
                 .setBadgeBackgroundColor(0xffffeb3b).setBadgeTextColor(0xff000000)
@@ -87,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         iv_numbercolor = (ImageView) findViewById(R.id.iv_numbercolor);
         button = (Button) findViewById(R.id.button);
         btn_animation = (Button) findViewById(R.id.btn_animation);
+        //将小红点放入可选择的空点里
         radioButtons.add((RadioButton) findViewById(R.id.rb_st));
         radioButtons.add((RadioButton) findViewById(R.id.rb_sb));
         RadioButton rb_et = (RadioButton) findViewById(R.id.rb_et);
@@ -106,8 +119,9 @@ public class MainActivity extends AppCompatActivity {
         swicth_draggable = (Switch) findViewById(R.id.swicth_draggable);
         swicth_shadow = (Switch) findViewById(R.id.swicth_shadow);
     }
-
+    //可选择的点设置监听，变化点击事件改变显示的数据
     private void initListener() {
+        //CompoundButton一个带有选中/未选中状态的按钮。当按钮按下或点中时自动改变状态。
         CompoundButton.OnCheckedChangeListener checkedChangeListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -115,11 +129,13 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 if (lastRadioButton != null) {
+                    //是否选中：未选中
                     lastRadioButton.setChecked(false);
                 }
                 lastRadioButton = buttonView;
                 for (Badge badge : badges) {
                     switch (buttonView.getId()) {
+                        //设置BadgeView显示的位置
                         case R.id.rb_st:
                             badge.setBadgeGravity(Gravity.START | Gravity.TOP);
                             break;
@@ -154,13 +170,16 @@ public class MainActivity extends AppCompatActivity {
         for (RadioButton rb : radioButtons) {
             rb.setOnCheckedChangeListener(checkedChangeListener);
         }
+        //进度条设置监听
         SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 for (Badge badge : badges) {
                     if (seekBar == seekBar_offsetx || seekBar == seekBar_offsety) {
+                        //进度条被拖动时
                         int x = seekBar_offsetx.getProgress();
                         int y = seekBar_offsety.getProgress();
+                        //TextView随进度条显示数据
                         tv_offsetx.setText("GravityOffsetX : " + x);
                         tv_offsety.setText("GravityOffsetY : " + y);
                         badge.setGravityOffset(x, y, true);
@@ -196,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
                     selectorColor(new OnColorClickListener() {
                         @Override
                         public void onColorClick(int color) {
+                            //设置背景色setBackgroundColor
                             iv_badgecolor.setBackgroundColor(color);
                             for (Badge badge : badges) {
                                 badge.setBadgeBackgroundColor(color);
@@ -214,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                 } else if (v == btn_animation) {
                     for (Badge badge : badges) {
+                        //隐藏
                         badge.hide(true);
                     }
                 }
@@ -240,8 +261,10 @@ public class MainActivity extends AppCompatActivity {
                     for (Badge badge : badges) {
                         if (editText == et_badgenumber) {
                             int num = TextUtils.isEmpty(s) ? 0 : Integer.parseInt(s.toString());
+                            //设置显示的数字
                             badge.setBadgeNumber(num);
                         } else if (editText == et_badgetext) {
+                            //设置显示的文本
                             badge.setBadgeText(s.toString());
                         }
                     }
@@ -263,6 +286,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 for (Badge badge : badges) {
                     if (buttonView == swicth_exact) {
+                        //设置是否显示精确模式数值
                         badge.setExactMode(isChecked);
                     } else if (buttonView == swicth_draggable) {
                         badge.setOnDragStateChangedListener(isChecked ?
@@ -289,6 +313,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 } : null);
                     } else if (buttonView == swicth_shadow) {
+                        //设置是否显示阴影：显示
                         badge.setShowShadow(isChecked);
                     }
                 }
@@ -298,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         swicth_draggable.setOnCheckedChangeListener(onCheckedChangeListener);
         swicth_shadow.setOnCheckedChangeListener(onCheckedChangeListener);
     }
-
+    //选择颜色
     private void selectorColor(final OnColorClickListener l) {
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         GridView gv = new GridView(this);

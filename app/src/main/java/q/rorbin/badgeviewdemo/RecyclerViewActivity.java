@@ -62,6 +62,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
                 badge.setBadgeGravity(Gravity.CENTER | Gravity.END);
                 badge.setBadgeTextSize(14, true);
                 badge.setBadgePadding(6, true);
+                //打开拖拽消除模式并设置监听
                 badge.setOnDragStateChangedListener(new Badge.OnDragStateChangedListener() {
                     @Override
                     public void onDragStateChanged(int dragState, Badge badge, View targetView) {
